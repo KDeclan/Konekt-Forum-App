@@ -1,6 +1,7 @@
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
+const cors = require('cors');
 const session = require('express-session');
 const passport = require('passport');
 const LocalStrategy = require('passport-local').Strategy;
@@ -11,8 +12,9 @@ const PORT = process.env.PORT || 3000;
 
 // Middleware for handling data parsing
 app.use(express.json());
-app.use(express.urlencoded({ extended: false }));
+app.use(express.urlencoded({ extended: true }));
 
+app.use(cors());
 
 // Connect to MongoDB and start server
 mongoose.connect(process.env.DB, { useNewUrlParser: true, useUnifiedTopology: true })
