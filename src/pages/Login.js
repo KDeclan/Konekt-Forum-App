@@ -1,4 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 import "../styles/Login.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
@@ -6,12 +8,30 @@ import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 const logoUrlGreen = "/images/colorkit.svg";
 
 function Login() {
+  const navigate = useNavigate();
+
+  // Check if the user is already authenticated
+  useEffect(() => {
+    const checkAuthStatus = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/auth/status", {
+          withCredentials: true, // Ensure cookies are sent with the request
+        });
+
+        if (response.status === 200 && response.data.authenticated) {
+          navigate("/dashboard"); // Redirect to dashboard if authenticated
+        }
+      } catch (error) {
+        console.error("Error checking authentication:", error);
+      }
+    };
+
+    checkAuthStatus();
+  }, [navigate]);
+
   const handleDiscordClick = () => {
-    alert("Discord button pressed!");
-    //Handle authentication for discord
-    //look into handling auth independent of specific platform
-    //use passport.js so will come from another file
-    //post to server with info then check with auth
+    // Redirect to Discord OAuth
+    window.location.href = "http://localhost:3000/auth/discord";
   };
 
   return (
