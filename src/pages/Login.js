@@ -10,7 +10,6 @@ const logoUrlGreen = "/images/colorkit.svg";
 function Login() {
   const navigate = useNavigate();
 
-  // Check if the user is already authenticated
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
@@ -19,7 +18,7 @@ function Login() {
         });
 
         if (response.status === 200 && response.data.authenticated) {
-          navigate("/dashboard"); // Redirect to dashboard if authenticated
+          navigate("/dashboard");
         }
       } catch (error) {
         console.error("Error checking authentication:", error);
@@ -30,7 +29,6 @@ function Login() {
   }, [navigate]);
 
   const handleDiscordClick = () => {
-    // Redirect to Discord OAuth
     window.location.href = "http://localhost:3000/auth/discord";
   };
 

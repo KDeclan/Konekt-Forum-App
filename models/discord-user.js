@@ -15,7 +15,7 @@ const discordUserSchema = new mongoose.Schema({
   },
   createdAt: {
     type: Date,
-    default: Date.now, // Automatically set the created date
+    default: Date.now,
   },
 });
 

@@ -1,21 +1,20 @@
 const jwt = require("jsonwebtoken");
 
 const authenticateToken = (req, res, next) => {
-  // Retrieve token from cookies
+  // Extract the token from the cookies
   const token = req.cookies.token;
 
   if (!token) {
-    return res.status(401).json({ message: "Unauthorized" });
+    return res.sendStatus(401); // Unauthorized if no token is found
   }
 
-  try {
-    // Verify the token using the JWT_SECRET
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    req.user = decoded; // Attach user data to the request object
-    next(); // Proceed to the next middleware/route handler
-  } catch (error) {
-    return res.status(403).json({ message: "Forbidden" });
-  }
+  jwt.verify(token, process.env.JWT_SECRET, (err, user) => {
+    if (err) {
+      return res.sendStatus(403); // Forbidden if token verification fails
+    }
+    req.user = user;
+    next();
+  });
 };
 
 module.exports = authenticateToken;
