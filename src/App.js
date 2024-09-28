@@ -6,6 +6,7 @@ import Dashboard from "./pages/Dashboard";
 
 const App = () => {
   const [authenticated, setAuthenticated] = useState(false);
+  const [user, setUser] = useState(null); // Store user info
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -17,14 +18,16 @@ const App = () => {
 
         if (response.status === 200 && response.data.authenticated) {
           setAuthenticated(true);
+          setUser(response.data.user); // Store user data
           navigate("/dashboard");
         } else {
           setAuthenticated(false);
+          setUser(null);
           navigate("/");
         }
       } catch (error) {
-        console.error("Error checking authentication:", error);
         setAuthenticated(false);
+        setUser(null);
         navigate("/");
       }
     };
@@ -35,10 +38,10 @@ const App = () => {
   return (
     <div>
       <Routes>
-        <Route path="/" element={authenticated ? <Dashboard /> : <Login />} />
+        <Route path="/" element={<Login authenticated={authenticated} />} />
         <Route
           path="/dashboard"
-          element={authenticated ? <Dashboard /> : <Login />}
+          element={<Dashboard authenticated={authenticated} user={user} />}
         />
       </Routes>
     </div>

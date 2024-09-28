@@ -1,32 +1,19 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 import "../styles/Login.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDiscord } from "@fortawesome/free-brands-svg-icons";
 
 const logoUrlGreen = "/images/colorkit.svg";
 
-function Login() {
+function Login({ authenticated }) {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const checkAuthStatus = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/auth/status", {
-          withCredentials: true, // Ensure cookies are sent with the request
-        });
-
-        if (response.status === 200 && response.data.authenticated) {
-          navigate("/dashboard");
-        }
-      } catch (error) {
-        console.error("Error checking authentication:", error);
-      }
-    };
-
-    checkAuthStatus();
-  }, [navigate]);
+    if (authenticated) {
+      navigate("/dashboard"); // Redirect to dashboard if already authenticated
+    }
+  }, [authenticated, navigate]);
 
   const handleDiscordClick = () => {
     window.location.href = "http://localhost:3000/auth/discord";
