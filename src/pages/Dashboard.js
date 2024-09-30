@@ -11,17 +11,15 @@ const Dashboard = ({ authenticated, user }) => {
 
   useEffect(() => {
     if (authenticated && user) {
-      // Extract the token from the cookie
       const token = document.cookie.replace(
         /(?:(?:^|.*;\s*)token\s*=([^;]*).*$)|^.*$/,
         "$1"
       );
-      console.log("Extracted token:", token);
 
-      // Initialize Socket.IO connection
       socketRef.current = io("http://localhost:3000", {
+        withCredentials: true,
         extraHeaders: {
-          Authorization: `Bearer ${token}`, // Use the extracted token
+          Authorization: `Bearer ${token}`,
         },
       });
 
@@ -33,27 +31,27 @@ const Dashboard = ({ authenticated, user }) => {
         console.error("Connection error:", error);
       });
 
-      // Listen for incoming messages
+      // Listen for incoming chat messages
       socketRef.current.on("message", (message) => {
         console.log("Received a message from the server:", message);
         setMessages((prevMessages) => [...prevMessages, message]);
       });
 
-      // Listen for users connecting
+      // Listen for a user connecting
       socketRef.current.on("userConnected", (message) => {
         console.log("User connected:", message);
         setMessages((prevMessages) => [
           ...prevMessages,
-          { system: true, text: message },
+          { system: true, text: message }, // Add system message
         ]);
       });
 
-      // Listen for users disconnecting
+      // Listen for a user disconnecting
       socketRef.current.on("userDisconnected", (message) => {
         console.log("User disconnected:", message);
         setMessages((prevMessages) => [
           ...prevMessages,
-          { system: true, text: message },
+          { system: true, text: message }, // Add system message
         ]);
       });
 
@@ -92,7 +90,7 @@ const Dashboard = ({ authenticated, user }) => {
 
     try {
       console.log("Sending message:", messageInput.trim());
-      socketRef.current.emit("message", { user, text: messageInput.trim() });
+      socketRef.current.emit("message", { text: messageInput.trim() });
       setMessageInput(""); // Clear the input field
     } catch (error) {
       console.error("Error sending message:", error);
@@ -104,7 +102,7 @@ const Dashboard = ({ authenticated, user }) => {
       console.log("Logging out...");
       await fetch("http://localhost:3000/auth/logout", {
         method: "GET",
-        credentials: "include", // Include cookies in the request
+        credentials: "include",
       });
 
       console.log("Logout successful. Redirecting to login page.");
@@ -115,7 +113,6 @@ const Dashboard = ({ authenticated, user }) => {
   };
 
   if (!authenticated || !user) {
-    console.warn("User is not authenticated. Redirecting to login page.");
     return <p>Please log in to access the dashboard.</p>;
   }
 
@@ -129,7 +126,7 @@ const Dashboard = ({ authenticated, user }) => {
               {messages.map((msg, index) => (
                 <div key={index}>
                   {msg.system ? (
-                    <em style={{ color: "gray" }}>{msg.text}</em>
+                    <em style={{ color: "gray" }}>{msg.text}</em> // Display system messages
                   ) : (
                     <strong>
                       <img
@@ -158,16 +155,15 @@ const Dashboard = ({ authenticated, user }) => {
           <h2>Connected Users:</h2>
           <ul>
             {onlineUsers.map((onlineUser, index) => (
-              <li key={index} style={{ color: "aliceblue" }}>
+              <p key={index} style={{ color: "aliceblue" }}>
                 {onlineUser.username}
-              </li>
+              </p>
             ))}
           </ul>
         </div>
 
         {/* Input-container Right Side */}
         <div className="input-container col-md-3 d-flex">
-          {/* Input Bar */}
           <div className="p-3 d-flex flex-column justify-content-center flex-grow-1">
             <form className="text-form" onSubmit={handleSendMessage}>
               <input

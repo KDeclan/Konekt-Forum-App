@@ -34,14 +34,21 @@ const onlineUsers = [];
 
 io.on("connection", (socket) => {
   const user = socket.user; // Extract the user information attached by the authenticateSocket middleware
+  console.log("User connected with details from DB:", user);
 
-  if (!user) {
+  if (!user || !user.username || !user.avatar || !user.discordId) {
+    console.error("User object is missing or incomplete.");
     socket.disconnect();
     return;
   }
 
   // Add the user to the list of connected users
-  onlineUsers.push({ id: socket.id, username: user.username, userId: user.id });
+  onlineUsers.push({
+    id: socket.id,
+    username: user.username,
+    userId: user.discordId, // Use the correct Discord ID
+    avatar: user.avatar,
+  });
 
   // Emit an event to all clients that a new user has connected
   socket.broadcast.emit(
@@ -51,6 +58,22 @@ io.on("connection", (socket) => {
 
   // Emit the updated list of users to all clients
   io.emit("usersUpdate", onlineUsers);
+
+  // Listen for incoming messages from this user
+  socket.on("message", (data) => {
+    console.log("Received a message from client:", data);
+    const userMessage = {
+      user: {
+        discordId: user.discordId,
+        username: user.username,
+        avatar: user.avatar,
+      },
+      text: data.text,
+    };
+
+    // Emit the message to all connected clients
+    io.emit("message", userMessage);
+  });
 
   // Handle user disconnection
   socket.on("disconnect", () => {

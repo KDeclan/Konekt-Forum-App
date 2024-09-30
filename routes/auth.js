@@ -23,20 +23,31 @@ router.get(
   }),
   (req, res) => {
     try {
-      // Generate JWT after successful authentication
-      const token = jwt.sign({ id: req.user._id }, process.env.JWT_SECRET, {
-        expiresIn: "1d", // Token expires in 1 day
-      });
+      // Generate JWT with username included
+      const token = jwt.sign(
+        {
+          id: req.user._id,
+          discordId: req.user.discordId,
+          username: req.user.username,
+          avatar: req.user.avatar,
+        },
+        process.env.JWT_SECRET,
+        {
+          expiresIn: "1d", // Token expires in 1 day
+        }
+      );
 
       // Set the JWT as an HTTP-only cookie
       res.cookie("token", token, {
         httpOnly: true, // Cookie cannot be accessed by JavaScript
         secure: false, // Use secure cookies in production
         sameSite: "lax",
+        path: "/", // Ensure the cookie is accessible throughout the app
         maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day
       });
 
       // Redirect to frontend after successful authentication
+      console.log("Redirecting to dashboard after setting token"); // Debugging
       res.redirect("http://localhost:3001/dashboard");
     } catch (error) {
       console.error("Error generating token:", error);
@@ -48,6 +59,7 @@ router.get(
 // Endpoint to check authentication status
 router.get("/status", authenticateToken, async (req, res) => {
   try {
+    console.log("Checking authentication status for user ID:", req.user.id); // Debugging
     const user = await User.findById(req.user.id).select(
       "discordId username avatar"
     );
@@ -70,6 +82,7 @@ router.get("/status", authenticateToken, async (req, res) => {
 // Endpoint to retrieve authenticated user information
 router.get("/user", authenticateToken, async (req, res) => {
   try {
+    console.log("Retrieving user information for ID:", req.user.id); // Debugging
     const user = await User.findById(req.user.id).select(
       "discordId username avatar"
     );
@@ -87,6 +100,7 @@ router.get("/user", authenticateToken, async (req, res) => {
 
 // Logout route to clear the authentication token
 router.get("/logout", (req, res) => {
+  console.log("Clearing token cookie on logout"); // Debugging
   res.clearCookie("token", {
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
