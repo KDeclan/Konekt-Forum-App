@@ -12,9 +12,12 @@ const App = () => {
   useEffect(() => {
     const checkAuthStatus = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/auth/status", {
-          withCredentials: true, // Include cookies in the request
-        });
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/auth/status`,
+          {
+            withCredentials: true, // Include cookies in the request
+          }
+        );
 
         if (response.status === 200 && response.data.authenticated) {
           setAuthenticated(true);

@@ -40,7 +40,7 @@ router.get(
       // Set the JWT as an HTTP-only cookie
       res.cookie("token", token, {
         httpOnly: true, // Cookie cannot be accessed by JavaScript
-        secure: false, // Use secure cookies in production
+        secure: process.env.NODE_ENV === "production",
         sameSite: "lax",
         path: "/", // Ensure the cookie is accessible throughout the app
         maxAge: 24 * 60 * 60 * 1000, // Cookie expires in 1 day
@@ -48,10 +48,10 @@ router.get(
 
       // Redirect to frontend after successful authentication
       console.log("Redirecting to dashboard after setting token"); // Debugging
-      res.redirect("http://localhost:3001/dashboard");
+      res.redirect(`${process.env.FRONTEND_URL}/dashboard`);
     } catch (error) {
       console.error("Error generating token:", error);
-      res.redirect("http://localhost:3001/login?error=auth_failed"); // Redirect to login page with error
+      res.redirect(`${process.env.FRONTEND_URL}/login?error=auth_failed`);
     }
   }
 );

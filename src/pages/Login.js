@@ -16,7 +16,7 @@ function Login({ authenticated }) {
   }, [authenticated, navigate]);
 
   const handleDiscordClick = () => {
-    window.location.href = "http://localhost:3000/auth/discord";
+    window.location.href = `${process.env.REACT_APP_API_URL}/auth/discord`; // Use environment variable
   };
 
   return (

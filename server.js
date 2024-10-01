@@ -17,7 +17,7 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
   cors: {
-    origin: "http://localhost:3001",
+    origin: process.env.FRONTEND_URL, // Update to use the FRONTEND_URL variable
     methods: ["GET", "POST"],
     credentials: true,
   },
@@ -99,10 +99,11 @@ connectDB();
 
 app.use(
   cors({
-    origin: "http://localhost:3001",
+    origin: process.env.FRONTEND_URL, // Use the FRONTEND_URL from the .env file
     credentials: true, // Allow cookies to be sent with requests
   })
 );
+
 app.use(express.json());
 app.use(cookieParser());
 
