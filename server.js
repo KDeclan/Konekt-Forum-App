@@ -12,6 +12,8 @@ const authRoutes = require("./routes/auth");
 const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
+// Serve static files from the React build directory
+app.use(express.static(path.join(__dirname, "build")));
 
 // Create HTTP server and Socket.IO instance
 const httpServer = createServer(app);
@@ -110,9 +112,6 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/auth", authRoutes);
-
-// Serve static files from the React build directory
-app.use(express.static(path.join(__dirname, "build")));
 
 // Handle any other requests (Let React handle them)
 app.get("*", (req, res) => {
