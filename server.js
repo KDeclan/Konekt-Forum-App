@@ -14,24 +14,27 @@ const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
 
-// Use helmet with specific CSP settings
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
-      defaultSrc: ["'self'"], // Allow resources from the same origin
-      scriptSrc: ["'self'", "https://apis.google.com"], // Adjust as needed
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
-      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"], // Allow images from your own domain
-      connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"], // Allow connections to your API
-      fontSrc: ["'self'", "https://fonts.googleapis.com"], // Allow font loading
-      objectSrc: ["'none'"], // Disallow object sources
-      upgradeInsecureRequests: [], // Upgrade insecure requests to HTTPS
+      defaultSrc: ["'self'"],
+      imgSrc: ["*"], // Allow images from any source temporarily
+      scriptSrc: ["'self'", "'unsafe-inline'"],
+      styleSrc: ["'self'", "'unsafe-inline'"],
+      connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"],
+      fontSrc: ["'self'", "https://fonts.gstatic.com"],
+      objectSrc: ["'none'"],
     },
   })
 );
 
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
+
+// Handle any other requests (Let React handle them)
+app.get("*", (req, res) => {
+  res.sendFile(path.join(__dirname, "build", "index.html"));
+});
 
 // Create HTTP server and Socket.IO instance
 const httpServer = createServer(app);
@@ -130,11 +133,6 @@ app.use(cookieParser());
 app.use(passport.initialize());
 
 app.use("/auth", authRoutes);
-
-// Handle any other requests (Let React handle them)
-app.get("*", (req, res) => {
-  res.sendFile(path.join(__dirname, "build", "index.html"));
-});
 
 httpServer.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
