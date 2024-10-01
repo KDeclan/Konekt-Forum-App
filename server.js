@@ -14,24 +14,47 @@ const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
 
+// Apply security middleware before other middleware
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
-      imgSrc: ["*"], // Allow images from any source temporarily
-      scriptSrc: ["'self'", "'unsafe-inline'"],
-      styleSrc: ["'self'", "'unsafe-inline'"],
-      connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"],
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      objectSrc: ["'none'"],
+      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"], // Ensure 'self' is included to allow images
+      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (only if necessary)
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
+      connectSrc: ["'self'", process.env.FRONTEND_URL], // Allow connections to your frontend/backend
+      fontSrc: ["'self'", "https://fonts.gstatic.com"], // Adjust as needed
+      objectSrc: ["'none'"], // Disallow object sources
+      upgradeInsecureRequests: [], // Ensure HTTP requests are upgraded to HTTPS
     },
   })
 );
 
+// Use CORS middleware before other middlewares
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL, // Use the FRONTEND_URL from the .env file
+    credentials: true, // Allow cookies to be sent with requests
+  })
+);
+
+// Parse JSON requests and cookies
+app.use(express.json());
+app.use(cookieParser());
+
+// Initialize Passport for authentication
+app.use(passport.initialize());
+
+// Connect to MongoDB
+connectDB();
+
+// Apply authentication routes
+app.use("/auth", authRoutes);
+
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
 
-// Handle any other requests (Let React handle them)
+// Catch-all handler to return the React app's index.html for any unknown routes
 app.get("*", (req, res) => {
   res.sendFile(path.join(__dirname, "build", "index.html"));
 });
@@ -55,6 +78,7 @@ io.use(authenticateSocket);
 
 const onlineUsers = [];
 
+// Set up Socket.IO events
 io.on("connection", (socket) => {
   const user = socket.user; // Extract the user information attached by the authenticateSocket middleware
   console.log("User connected with details from DB:", user);
@@ -117,22 +141,6 @@ io.on("connection", (socket) => {
 });
 
 const PORT = process.env.PORT || 3000;
-
-connectDB();
-
-app.use(
-  cors({
-    origin: process.env.FRONTEND_URL, // Use the FRONTEND_URL from the .env file
-    credentials: true, // Allow cookies to be sent with requests
-  })
-);
-
-app.use(express.json());
-app.use(cookieParser());
-
-app.use(passport.initialize());
-
-app.use("/auth", authRoutes);
 
 httpServer.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
