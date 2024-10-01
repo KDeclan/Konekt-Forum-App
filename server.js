@@ -8,10 +8,28 @@ const passport = require("./config/passport");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
+const helmet = require("helmet");
 
 const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
+
+// Use helmet with specific CSP settings
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"], // Allow resources from the same origin
+      scriptSrc: ["'self'", "https://apis.google.com"], // Adjust as needed
+      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles if needed
+      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"], // Allow images from your own domain
+      connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"], // Allow connections to your API
+      fontSrc: ["'self'", "https://fonts.googleapis.com"], // Allow font loading
+      objectSrc: ["'none'"], // Disallow object sources
+      upgradeInsecureRequests: [], // Upgrade insecure requests to HTTPS
+    },
+  })
+);
+
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
 
