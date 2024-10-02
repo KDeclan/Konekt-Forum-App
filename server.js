@@ -8,27 +8,10 @@ const passport = require("./config/passport");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const authRoutes = require("./routes/auth");
-const helmet = require("helmet");
 
 const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
-
-// Apply security middleware before other middleware
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
-      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"], // Ensure 'self' is included to allow images
-      scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts (only if necessary)
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-      connectSrc: ["'self'", process.env.FRONTEND_URL], // Allow connections to your frontend/backend
-      fontSrc: ["'self'", "https://fonts.gstatic.com"], // Adjust as needed
-      objectSrc: ["'none'"], // Disallow object sources
-      upgradeInsecureRequests: [], // Ensure HTTP requests are upgraded to HTTPS
-    },
-  })
-);
 
 // Use CORS middleware before other middlewares
 app.use(
