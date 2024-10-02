@@ -27,7 +27,7 @@ app.use(
         connectSrc: ["'self'", process.env.FRONTEND_URL],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
+        upgradeInsecureRequests: true,
       },
     },
   })
