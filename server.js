@@ -13,6 +13,8 @@ const helmet = require("helmet");
 const { authenticateSocket } = require("./middleware/authMiddleware");
 
 const app = express();
+const FRONTEND_URL =
+  process.env.FRONTEND_URL || "https://konekt-forum-app.onrender.com";
 
 // Apply security middleware before other middleware
 
@@ -24,10 +26,10 @@ app.use(
         imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"],
         scriptSrc: ["'self'", "'unsafe-inline'"],
         styleSrc: ["'self'", "'unsafe-inline'"],
-        connectSrc: ["'self'", process.env.FRONTEND_URL],
+        connectSrc: ["'self'", FRONTEND_URL],
         fontSrc: ["'self'", "https://fonts.gstatic.com"],
         objectSrc: ["'none'"],
-        upgradeInsecureRequests: true,
+        upgradeInsecureRequests: [],
       },
     },
   })
