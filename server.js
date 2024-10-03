@@ -18,20 +18,7 @@ const FRONTEND_URL =
 
 // Apply security middleware before other middleware
 
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'", "https://konekt-forum-app.onrender.com"],
-      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"],
-      scriptSrc: ["'self'", "https://apis.google.com"],
-      styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles
-      fontSrc: ["'self'", "https://fonts.gstatic.com"],
-      connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"],
-      objectSrc: ["'none'"],
-      upgradeInsecureRequests: [],
-    },
-  })
-);
+app.use(helmet()); // Without the contentSecurityPolicy method
 
 // Use CORS middleware before other middlewares
 app.use(
