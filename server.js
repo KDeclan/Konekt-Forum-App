@@ -18,6 +18,8 @@ const FRONTEND_URL =
 
 // Apply security middleware before other middleware
 
+// Handle requests for favicon.ico
+app.get("/favicon.ico", (req, res) => res.status(204));
 app.use(helmet()); // Without the contentSecurityPolicy method
 
 // Use CORS middleware before other middlewares
