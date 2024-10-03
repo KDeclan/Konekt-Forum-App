@@ -18,8 +18,6 @@ const FRONTEND_URL =
 
 // Apply security middleware before other middleware
 
-// Handle requests for favicon.ico
-app.get("/favicon.ico", (req, res) => res.status(204));
 app.use(helmet()); // Without the contentSecurityPolicy method
 
 // Use CORS middleware before other middlewares
@@ -45,6 +43,9 @@ app.use("/auth", authRoutes);
 
 // Serve static files from the React build directory
 app.use(express.static(path.join(__dirname, "build")));
+
+// Handle requests for favicon.ico to prevent the browser from requesting a non-existent favicon
+app.get("/favicon.ico", (req, res) => res.status(204)); // No Content
 
 // Catch-all handler to return the React app's index.html for any unknown routes
 app.get("*", (req, res) => {
