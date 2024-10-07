@@ -100,7 +100,7 @@ const Dashboard = ({ authenticated, user }) => {
   const handleLogout = async () => {
     try {
       console.log("Logging out...");
-      await fetch("http://localhost:3000/auth/logout", {
+      await fetch(`${process.env.API_URL}/auth/logout`, {
         method: "GET",
         credentials: "include",
       });

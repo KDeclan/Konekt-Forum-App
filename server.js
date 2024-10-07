@@ -21,11 +21,11 @@ app.use(
   helmet.contentSecurityPolicy({
     directives: {
       defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"],
       scriptSrc: ["'self'", "https://apis.google.com", "'unsafe-inline'"], // Allow inline scripts
       styleSrc: ["'self'", "'unsafe-inline'"],
       fontSrc: ["'self'", "https://fonts.gstatic.com"],
       connectSrc: ["'self'", "https://konekt-forum-app.onrender.com"],
-      imgSrc: ["'self'", "data:", "https://konekt-forum-app.onrender.com"],
       objectSrc: ["'none'"],
       upgradeInsecureRequests: [],
     },
