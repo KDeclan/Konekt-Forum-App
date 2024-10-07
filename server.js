@@ -17,7 +17,6 @@ const FRONTEND_URL =
   process.env.FRONTEND_URL || "https://konekt-forum-app.onrender.com";
 
 // Apply security middleware before other middleware
-
 app.use(
   helmet.contentSecurityPolicy({
     directives: {
@@ -83,6 +82,7 @@ const io = new Server(httpServer, {
 io.use(authenticateSocket);
 
 const onlineUsers = [];
+const roomName = "globalChat"; // Define a common room name for all users
 
 // Set up Socket.IO events
 io.on("connection", (socket) => {
@@ -95,6 +95,9 @@ io.on("connection", (socket) => {
     return;
   }
 
+  // Make the user join the "globalChat" room
+  socket.join(roomName);
+
   // Add the user to the list of connected users
   onlineUsers.push({
     id: socket.id,
@@ -103,14 +106,14 @@ io.on("connection", (socket) => {
     avatar: user.avatar,
   });
 
-  // Emit an event to all clients that a new user has connected
-  socket.broadcast.emit(
+  // Notify everyone in the room that a new user has connected
+  io.to(roomName).emit(
     "userConnected",
     `${user.username} has joined the chat.`
   );
 
-  // Emit the updated list of users to all clients
-  io.emit("usersUpdate", onlineUsers);
+  // Emit the updated list of users to all clients in the room
+  io.to(roomName).emit("usersUpdate", onlineUsers);
 
   // Listen for incoming messages from this user
   socket.on("message", (data) => {
@@ -124,8 +127,8 @@ io.on("connection", (socket) => {
       text: data.text,
     };
 
-    // Emit the message to all connected clients
-    io.emit("message", userMessage);
+    // Emit the message to all clients in the room
+    io.to(roomName).emit("message", userMessage);
   });
 
   // Handle user disconnection
@@ -134,14 +137,14 @@ io.on("connection", (socket) => {
     if (index !== -1) {
       const disconnectedUser = onlineUsers.splice(index, 1)[0];
 
-      // Emit an event to all clients that a user has disconnected
-      socket.broadcast.emit(
+      // Notify others in the room that the user has disconnected
+      io.to(roomName).emit(
         "userDisconnected",
         `${disconnectedUser.username} has left the chat.`
       );
 
-      // Update the list of connected users
-      io.emit("usersUpdate", onlineUsers);
+      // Update the list of connected users in the room
+      io.to(roomName).emit("usersUpdate", onlineUsers);
     }
   });
 });
